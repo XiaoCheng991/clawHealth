@@ -1,0 +1,73 @@
+/* ============================================================
+   ClawHealth – custom styles
+   ============================================================ */
+
+:root {
+  --ch-radius: 0.75rem;
+}
+
+body {
+  background-color: #f4f6fb;
+  min-height: 100vh;
+}
+
+/* ----- Metric Cards ----- */
+.card-metric .card-body {
+  padding: 1rem 0.75rem;
+}
+
+.metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #212529;
+}
+
+.metric-label {
+  font-size: 0.72rem;
+  color: #6c757d;
+  margin-top: 0.15rem;
+}
+
+/* ----- Cards ----- */
+.card {
+  border-radius: var(--ch-radius);
+}
+
+.card-header {
+  border-radius: var(--ch-radius) var(--ch-radius) 0 0 !important;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* ----- Navbar ----- */
+.navbar-brand {
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+
+/* ----- Tables ----- */
+.table > :not(caption) > * > * {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+/* ----- Footer ----- */
+.footer {
+  font-size: 0.8rem;
+}
+
+/* ----- Responsive chart containers ----- */
+canvas {
+  max-width: 100%;
+}

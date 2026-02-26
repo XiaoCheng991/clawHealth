@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClawHealth · 个人健康数据管理</title>
+  <link rel="stylesheet" href="/static/vendor/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/vendor/css/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="bi bi-heart-pulse-fill me-2"></i>ClawHealth
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" data-tab="dashboard">
+              <i class="bi bi-grid-1x2-fill me-1"></i>健康仪表盘
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-tab="watch">
+              <i class="bi bi-watch me-1"></i>Apple Watch
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-tab="food">
+              <i class="bi bi-egg-fried me-1"></i>食物分析
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-tab="goals">
+              <i class="bi bi-bullseye me-1"></i>目标设置
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container-fluid py-4 px-4">
+
+    <!-- ====== DASHBOARD TAB ====== -->
+    <section id="tab-dashboard">
+      <div class="d-flex align-items-center mb-4">
+        <h2 class="fw-bold mb-0 me-3"><i class="bi bi-grid-1x2-fill text-primary me-2"></i>健康仪表盘</h2>
+        <div class="ms-auto">
+          <select id="dashDays" class="form-select form-select-sm">
+            <option value="7">最近 7 天</option>
+            <option value="14">最近 14 天</option>
+            <option value="30">最近 30 天</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="row g-3 mb-4" id="summaryCards">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card card-metric shadow-sm h-100 border-0">
+            <div class="card-body text-center">
+              <div class="metric-icon bg-primary-subtle mb-2"><i class="bi bi-lightning-charge-fill text-primary"></i></div>
+              <div class="metric-value" id="sum-steps">—</div>
+              <div class="metric-label">平均步数</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card card-metric shadow-sm h-100 border-0">
+            <div class="card-body text-center">
+              <div class="metric-icon bg-danger-subtle mb-2"><i class="bi bi-heart-fill text-danger"></i></div>
+              <div class="metric-value" id="sum-hr">—</div>
+              <div class="metric-label">平均心率 (bpm)</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card card-metric shadow-sm h-100 border-0">
+            <div class="card-body text-center">
+              <div class="metric-icon bg-warning-subtle mb-2"><i class="bi bi-fire text-warning"></i></div>
+              <div class="metric-value" id="sum-cal">—</div>
+              <div class="metric-label">平均消耗 (kcal)</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card card-metric shadow-sm h-100 border-0">
+            <div class="card-body text-center">
+              <div class="metric-icon bg-info-subtle mb-2"><i class="bi bi-moon-stars-fill text-info"></i></div>
+              <div class="metric-value" id="sum-sleep">—</div>
+              <div class="metric-label">平均睡眠 (h)</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card card-metric shadow-sm h-100 border-0">
+            <div class="card-body text-center">
+              <div class="metric-icon bg-success-subtle mb-2"><i class="bi bi-lungs-fill text-success"></i></div>
+              <div class="metric-value" id="sum-spo2">—</div>
+              <div class="metric-label">平均血氧 (%)</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="card card-metric shadow-sm h-100 border-0">
+            <div class="card-body text-center">
+              <div class="metric-icon bg-secondary-subtle mb-2"><i class="bi bi-stopwatch-fill text-secondary"></i></div>
+              <div class="metric-value" id="sum-active">—</div>
+              <div class="metric-label">平均运动 (min)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trend Charts -->
+      <div class="row g-4">
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-lightning-charge text-primary me-1"></i>步数趋势
+            </div>
+            <div class="card-body"><canvas id="chartSteps" height="90"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-heart text-danger me-1"></i>心率趋势
+            </div>
+            <div class="card-body"><canvas id="chartHR" height="90"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-fire text-warning me-1"></i>卡路里消耗趋势
+            </div>
+            <div class="card-body"><canvas id="chartCal" height="90"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-moon-stars text-info me-1"></i>睡眠时长趋势
+            </div>
+            <div class="card-body"><canvas id="chartSleep" height="90"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== APPLE WATCH TAB ====== -->
+    <section id="tab-watch" class="d-none">
+      <h2 class="fw-bold mb-4"><i class="bi bi-watch text-primary me-2"></i>Apple Watch 数据接入</h2>
+
+      <div class="row g-4">
+        <!-- Sync Form -->
+        <div class="col-12 col-lg-5">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-arrow-repeat me-1 text-success"></i>同步健康数据
+            </div>
+            <div class="card-body">
+              <form id="syncForm">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label">记录时间</label>
+                    <input type="datetime-local" id="sw-datetime" class="form-control form-control-sm" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">步数</label>
+                    <input type="number" id="sw-steps" class="form-control form-control-sm" placeholder="8000" min="0" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">心率 (bpm)</label>
+                    <input type="number" id="sw-hr" class="form-control form-control-sm" placeholder="72" min="0" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">消耗卡路里</label>
+                    <input type="number" id="sw-cal" class="form-control form-control-sm" placeholder="450" min="0" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">运动时长 (min)</label>
+                    <input type="number" id="sw-active" class="form-control form-control-sm" placeholder="30" min="0" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">睡眠时长 (h)</label>
+                    <input type="number" id="sw-sleep" class="form-control form-control-sm" placeholder="7.5" min="0" step="0.1" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">血氧 (%)</label>
+                    <input type="number" id="sw-spo2" class="form-control form-control-sm" placeholder="98" min="0" max="100" />
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">运动类型</label>
+                    <select id="sw-workout" class="form-select form-select-sm">
+                      <option value="">— 无 —</option>
+                      <option>跑步</option>
+                      <option>步行</option>
+                      <option>骑行</option>
+                      <option>游泳</option>
+                      <option>力量训练</option>
+                      <option>瑜伽</option>
+                      <option>HIIT</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">运动时长 (min)</label>
+                    <input type="number" id="sw-workout-dur" class="form-control form-control-sm" placeholder="45" min="0" />
+                  </div>
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                  <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                    <i class="bi bi-cloud-upload me-1"></i>同步
+                  </button>
+                  <button type="button" id="btnFillDemo" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-magic me-1"></i>演示数据
+                  </button>
+                </div>
+              </form>
+              <div id="syncAlert" class="mt-3 d-none"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Records Table -->
+        <div class="col-12 col-lg-7">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-transparent fw-semibold d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-table me-1 text-primary"></i>最近记录</span>
+              <button id="btnLoadRecords" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0 align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>时间</th>
+                      <th>步数</th>
+                      <th>心率</th>
+                      <th>消耗</th>
+                      <th>睡眠</th>
+                      <th>血氧</th>
+                      <th>运动</th>
+                    </tr>
+                  </thead>
+                  <tbody id="watchTableBody">
+                    <tr><td colspan="7" class="text-center text-muted py-4">暂无数据</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== FOOD ANALYSIS TAB ====== -->
+    <section id="tab-food" class="d-none">
+      <h2 class="fw-bold mb-4"><i class="bi bi-egg-fried text-primary me-2"></i>食物分析</h2>
+
+      <div class="row g-4">
+        <!-- Add Food Form -->
+        <div class="col-12 col-lg-4">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-plus-circle me-1 text-success"></i>添加饮食记录
+            </div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label class="form-label">日期</label>
+                <input type="date" id="food-date" class="form-control form-control-sm" />
+              </div>
+              <div class="mb-2">
+                <label class="form-label">餐次</label>
+                <select id="food-meal" class="form-select form-select-sm">
+                  <option value="breakfast">早餐</option>
+                  <option value="lunch">午餐</option>
+                  <option value="dinner">晚餐</option>
+                  <option value="snack">加餐/零食</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">食物名称</label>
+                <input type="text" id="food-name" class="form-control form-control-sm" placeholder="例：米饭" list="foodSuggestions" />
+                <datalist id="foodSuggestions">
+                  <option value="米饭"><option value="面条"><option value="鸡胸肉">
+                  <option value="鸡蛋"><option value="牛奶"><option value="苹果">
+                  <option value="香蕉"><option value="西蓝花"><option value="沙拉">
+                  <option value="燕麦粥"><option value="全麦面包"><option value="豆腐">
+                  <option value="三文鱼"><option value="牛肉"><option value="酸奶">
+                </datalist>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label">份量 (g)</label>
+                  <input type="number" id="food-amount" class="form-control form-control-sm" placeholder="100" min="0" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">热量 (kcal)</label>
+                  <input type="number" id="food-cal" class="form-control form-control-sm" placeholder="0" min="0" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">蛋白质 (g)</label>
+                  <input type="number" id="food-protein" class="form-control form-control-sm" placeholder="0" min="0" step="0.1" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">碳水化合物 (g)</label>
+                  <input type="number" id="food-carbs" class="form-control form-control-sm" placeholder="0" min="0" step="0.1" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">脂肪 (g)</label>
+                  <input type="number" id="food-fat" class="form-control form-control-sm" placeholder="0" min="0" step="0.1" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">膳食纤维 (g)</label>
+                  <input type="number" id="food-fiber" class="form-control form-control-sm" placeholder="0" min="0" step="0.1" />
+                </div>
+              </div>
+              <button id="btnAddFood" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-plus-lg me-1"></i>添加记录
+              </button>
+              <div id="foodAlert" class="mt-2 d-none"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analysis Panel -->
+        <div class="col-12 col-lg-8">
+          <!-- Nutrition Summary -->
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-transparent fw-semibold d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-pie-chart-fill me-1 text-primary"></i>今日营养摘要</span>
+              <button id="btnRefreshFood" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-6 col-md-3 text-center">
+                  <div class="fw-bold fs-4 text-warning" id="food-total-cal">0</div>
+                  <div class="text-muted small">热量 (kcal)</div>
+                  <div class="progress mt-1" style="height:6px">
+                    <div id="food-cal-bar" class="progress-bar bg-warning" style="width:0%"></div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="fw-bold fs-4 text-primary" id="food-total-protein">0g</div>
+                  <div class="text-muted small">蛋白质</div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="fw-bold fs-4 text-success" id="food-total-carbs">0g</div>
+                  <div class="text-muted small">碳水化合物</div>
+                </div>
+                <div class="col-6 col-md-3 text-center">
+                  <div class="fw-bold fs-4 text-danger" id="food-total-fat">0g</div>
+                  <div class="text-muted small">脂肪</div>
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-12 col-md-5">
+                  <canvas id="chartMacros" height="180"></canvas>
+                </div>
+                <div class="col-12 col-md-7">
+                  <canvas id="chartFoodTrend" height="180"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Food Log Table -->
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-journal-text me-1 text-primary"></i>今日饮食记录
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0 align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>餐次</th>
+                      <th>食物</th>
+                      <th>份量(g)</th>
+                      <th>热量</th>
+                      <th>蛋白质</th>
+                      <th>碳水</th>
+                      <th>脂肪</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="foodTableBody">
+                    <tr><td colspan="8" class="text-center text-muted py-4">暂无记录</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== GOALS TAB ====== -->
+    <section id="tab-goals" class="d-none">
+      <h2 class="fw-bold mb-4"><i class="bi bi-bullseye text-primary me-2"></i>健康目标设置</h2>
+      <div class="row g-4 justify-content-center">
+        <div class="col-12 col-md-6 col-xl-5">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent fw-semibold">
+              <i class="bi bi-sliders me-1 text-primary"></i>每日目标
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label"><i class="bi bi-lightning-charge text-primary me-1"></i>每日步数目标</label>
+                <input type="number" id="goal-steps" class="form-control" placeholder="10000" min="0" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label"><i class="bi bi-egg-fried text-warning me-1"></i>每日摄入热量目标 (kcal)</label>
+                <input type="number" id="goal-cal-in" class="form-control" placeholder="2000" min="0" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label"><i class="bi bi-fire text-danger me-1"></i>每日消耗热量目标 (kcal)</label>
+                <input type="number" id="goal-cal-burn" class="form-control" placeholder="500" min="0" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label"><i class="bi bi-moon-stars text-info me-1"></i>每日睡眠目标 (h)</label>
+                <input type="number" id="goal-sleep" class="form-control" placeholder="8" min="0" step="0.5" />
+              </div>
+              <div class="mb-4">
+                <label class="form-label"><i class="bi bi-stopwatch text-secondary me-1"></i>每日运动时长目标 (min)</label>
+                <input type="number" id="goal-active" class="form-control" placeholder="30" min="0" />
+              </div>
+              <button id="btnSaveGoals" class="btn btn-primary w-100">
+                <i class="bi bi-check-lg me-1"></i>保存目标
+              </button>
+              <div id="goalsAlert" class="mt-3 d-none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer mt-auto py-3 bg-light border-top">
+    <div class="container text-center text-muted small">
+      ClawHealth · 个人健康数据管理系统 &mdash; Apple Watch 数据接入 · 食物分析 · 健康仪表盘
+    </div>
+  </footer>
+
+  <script src="/static/vendor/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/vendor/js/chart.umd.min.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
